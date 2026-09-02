@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import { scripts } from '../scripts'
+import { ENABLED_SCRIPTS_KEY, type EnabledScriptsMap } from '../scripts/storage'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [enabled, setEnabled] = useState<EnabledScriptsMap>({})
   const [url, setUrl] = useState('')
 
-  // Example: read persisted state from chrome.storage when the popup opens
   useEffect(() => {
-    chrome.storage.local.get(['count'], (result: { count?: number }) => {
-      setCount(result.count ?? 0)
+    chrome.storage.local.get([ENABLED_SCRIPTS_KEY], (result: { [ENABLED_SCRIPTS_KEY]?: EnabledScriptsMap }) => {
+      setEnabled(result[ENABLED_SCRIPTS_KEY] ?? {})
     })
 
     // Example: talk to the active tab to learn about the page the popup is open on
@@ -17,21 +18,36 @@ function App() {
     })
   }, [])
 
-  const increment = () => {
-    const next = count + 1
-    setCount(next)
-    // Persist so the value survives the popup closing (popups unmount on close!)
-    chrome.storage.local.set({ count: next })
+  const toggleScript = (id: string) => {
+    // Scripts run by default, so absence of a key means "on".
+    const isCurrentlyEnabled = enabled[id] !== false
+    const next = { ...enabled, [id]: !isCurrentlyEnabled }
+    setEnabled(next)
+    chrome.storage.local.set({ [ENABLED_SCRIPTS_KEY]: next })
   }
 
   return (
     <div className="app">
       <h1>TWP Script Deployer</h1>
       <p className="url">Active tab: {url}</p>
-      <button onClick={increment}>Count is {count}</button>
-      <p className="hint">
-        Edit <code>src/popup/App.tsx</code> and reload the extension to see changes.
-      </p>
+      <ul className="script-list">
+        {scripts.map((script) => {
+          const isEnabled = enabled[script.id] !== false
+          return (
+            <li key={script.id} className="script-item">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isEnabled}
+                  onChange={() => toggleScript(script.id)}
+                />
+                <span className="script-name">{script.name}</span>
+              </label>
+              <p className="script-description">{script.description}</p>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }

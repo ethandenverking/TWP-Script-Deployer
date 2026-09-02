@@ -1,6 +1,7 @@
 # TWP Script Deployer
 
-A Chrome extension (Manifest V3) built with React, TypeScript, and Vite.
+A Chrome extension (Manifest V3) that deploys and manages custom scripts on
+TimeWorksPlus (TWP) pages. Built with React, TypeScript, and Vite.
 
 ## Development
 
@@ -23,21 +24,35 @@ Outputs a load-able extension to `dist/`.
 ## Project structure
 
 - `manifest.json` — the extension's manifest (MV3). Declares the popup,
-  background service worker, content script, and permissions.
+  background service worker, content script, and permissions. `matches` is
+  currently `<all_urls>` as a placeholder — narrow it to the real TWP
+  domain(s) once known.
 - `vite.config.ts` — build config. The `@crxjs/vite-plugin` reads
   `manifest.json` and wires up the special build steps a Chrome extension
   needs (separate bundles per entry point, HMR for the popup, etc.).
+- `src/scripts/` — the script registry. Each script implements the
+  `TwpScript` interface (`src/scripts/types.ts`) and is registered in
+  `src/scripts/index.ts`. Add a new file here + register it to deploy a new
+  script.
 - `src/popup/` — the React app shown when you click the extension's toolbar
-  icon (`index.html` → `main.tsx` → `App.tsx`).
+  icon (`index.html` → `main.tsx` → `App.tsx`). Lists every registered script
+  with a checkbox to enable/disable it (persisted to `chrome.storage.local`).
 - `src/background/index.ts` — the background **service worker**. Runs
   persistently (no DOM), good for handling events/messages/alarms.
-- `src/content/index.ts` — a **content script** injected into web pages that
-  match the `matches` pattern in `manifest.json`. Runs alongside the page's
-  own scripts but in an isolated JS context.
+- `src/content/index.ts` — a **content script** injected into TWP pages. On
+  load it reads the enabled/disabled state from `chrome.storage.local` and
+  runs every enabled script whose `urlPattern` (if any) matches the page.
+
+## Adding a new script
+
+1. Copy `src/scripts/example-script.ts`, give it a unique `id`.
+2. Implement `run()` with the DOM automation/logic to deploy.
+3. Register it in the `scripts` array in `src/scripts/index.ts`.
+4. Reload the extension — it now shows up in the popup, enabled by default.
 
 ## Key concepts to learn from this boilerplate
 
-- **`chrome.storage.local`** (used in `App.tsx`) persists data across popup
+- **`chrome.storage.local`** persists which scripts are enabled across popup
   opens/closes — popups fully unmount when closed, so `useState` alone won't
   survive.
 - **`chrome.tabs.query`** lets the popup ask which tab is currently active.
@@ -46,3 +61,4 @@ Outputs a load-able extension to `dist/`.
   contexts.
 - **Permissions** in `manifest.json` (`storage`, `activeTab`) must list every
   Chrome API surface you use, or calls will fail silently/throw.
+
