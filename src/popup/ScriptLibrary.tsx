@@ -1,96 +1,131 @@
-import { useEffect, useState } from 'react'
+import type { TwpScriptTemplate } from '../scripts/twp-script-content'
 import { twpScriptPages } from '../scripts/twp-pages'
-import { SAVED_SCRIPTS_KEY, type SavedTwpScript } from '../scripts/storage'
+import { stripScriptSuffix, filledPageCount } from './format'
 
-const pageOptions = Object.values(twpScriptPages)
+const pages = Object.values(twpScriptPages)
 
-const emptyForm = { name: '', pageId: pageOptions[0]?.id ?? '', content: '' }
+interface ScriptLibraryProps {
+  activeTabHost: string
+  templates: TwpScriptTemplate[]
+  selectedTemplateId: string
+  onSelect: (id: string) => void
+  onOpenEditor: (id: string) => void
+  onRunRoutine: () => void
+  onEdit: () => void
+  onNew: () => void
+}
 
-function ScriptLibrary() {
-  const [savedScripts, setSavedScripts] = useState<SavedTwpScript[]>([])
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [form, setForm] = useState(emptyForm)
+function contentPreview(template: TwpScriptTemplate): string {
+  const filled = pages.filter((page) => Boolean(template.content[page.id]))
+  if (filled.length === 0) return 'no content yet'
+  return filled.map((page) => stripScriptSuffix(page.label)).join(' · ')
+}
 
-  useEffect(() => {
-    chrome.storage.local.get([SAVED_SCRIPTS_KEY], (result: { [SAVED_SCRIPTS_KEY]?: SavedTwpScript[] }) => {
-      setSavedScripts(result[SAVED_SCRIPTS_KEY] ?? [])
-    })
-  }, [])
-
-  const persist = (next: SavedTwpScript[]) => {
-    setSavedScripts(next)
-    chrome.storage.local.set({ [SAVED_SCRIPTS_KEY]: next })
-  }
-
-  const resetForm = () => {
-    setEditingId(null)
-    setForm(emptyForm)
-  }
-
-  const startEdit = (script: SavedTwpScript) => {
-    setEditingId(script.id)
-    setForm({ name: script.name, pageId: script.pageId, content: script.content })
-  }
-
-  const deleteScript = (id: string) => {
-    persist(savedScripts.filter((s) => s.id !== id))
-    if (editingId === id) resetForm()
-  }
-
-  const submitForm = () => {
-    if (!form.name.trim() || !form.pageId) return
-
-    if (editingId) {
-      persist(savedScripts.map((s) => (s.id === editingId ? { ...s, ...form } : s)))
-    } else {
-      persist([...savedScripts, { id: crypto.randomUUID(), ...form }])
-    }
-    resetForm()
-  }
+function ScriptLibrary({
+  activeTabHost,
+  templates,
+  selectedTemplateId,
+  onSelect,
+  onOpenEditor,
+  onRunRoutine,
+  onEdit,
+  onNew,
+}: ScriptLibraryProps) {
+  const selectedTemplate = templates.find((t) => t.id === selectedTemplateId) ?? null
 
   return (
-    <div className="script-library">
-      <h2>Script Library</h2>
-      <ul className="script-list">
-        {savedScripts.map((script) => {
-          const page = twpScriptPages[script.pageId]
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '16px 18px 10px' }}>
+        <div>
+          <div style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(32,30,29,.55)' }}>
+            TWP Script Deployer
+          </div>
+          <h3 style={{ margin: '2px 0 0', fontSize: 23, letterSpacing: '-.02em' }}>Library</h3>
+        </div>
+        {activeTabHost && <span className="tag tag-accent">{activeTabHost}</span>}
+      </div>
+
+      <div style={{ padding: '0 18px', flex: 1, overflow: 'auto' }}>
+        {templates.length === 0 && (
+          <p style={{ fontSize: 12.5, fontStyle: 'italic', color: 'rgba(32,30,29,.58)' }}>
+            No templates yet — start one with the ＋ button below.
+          </p>
+        )}
+        {templates.map((template) => {
+          const isSelected = template.id === selectedTemplateId
+          const edge = isSelected ? '#0088b0' : 'transparent'
+          const bg = isSelected ? '#e9f8ff' : 'transparent'
           return (
-            <li key={script.id} className="script-item">
-              <span className="script-name">{script.name}</span>
-              <p className="script-description">{page?.label ?? script.pageId}</p>
-              <div className="script-actions">
-                <button onClick={() => startEdit(script)}>Edit</button>
-                <button onClick={() => deleteScript(script.id)}>Delete</button>
-              </div>
-            </li>
+            <div
+              key={template.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => onSelect(template.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  onSelect(template.id)
+                }
+              }}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                alignItems: 'baseline',
+                gap: '4px 12px',
+                padding: '11px 10px 11px 12px',
+                margin: '0 -10px 0 -12px',
+                cursor: 'pointer',
+                borderLeft: `3px solid ${edge}`,
+                background: bg,
+              }}
+            >
+              <span
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onOpenEditor(template.id)
+                }}
+                style={{
+                  fontSize: 16.5,
+                  letterSpacing: '-.01em',
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgba(0,136,176,.4)',
+                  textUnderlineOffset: '3px',
+                }}
+              >
+                {template.label}
+              </span>
+              <span style={{ fontSize: 11, letterSpacing: '.06em', textTransform: 'uppercase', color: 'rgba(32,30,29,.5)' }}>
+                {filledPageCount(template)} slots
+              </span>
+              <span style={{ gridColumn: '1/-1', fontSize: 12.5, color: 'rgba(32,30,29,.58)', fontStyle: 'italic' }}>
+                {contentPreview(template)}
+              </span>
+            </div>
           )
         })}
-      </ul>
+      </div>
 
-      <div className="script-form">
-        <input
-          type="text"
-          placeholder="Script name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-        />
-        <select value={form.pageId} onChange={(e) => setForm({ ...form, pageId: e.target.value })}>
-          {pageOptions.map((page) => (
-            <option key={page.id} value={page.id}>
-              {page.label || page.id}
-            </option>
-          ))}
-        </select>
-        <textarea
-          placeholder="TWP script content"
-          rows={6}
-          value={form.content}
-          onChange={(e) => setForm({ ...form, content: e.target.value })}
-        />
-        <div className="script-actions">
-          <button onClick={submitForm}>{editingId ? 'Save changes' : 'Add script'}</button>
-          {editingId && <button onClick={resetForm}>Cancel</button>}
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px 6px' }}>
+        <button
+          className="btn btn-primary"
+          onClick={onRunRoutine}
+          disabled={!selectedTemplate}
+          style={{ flex: 1, minHeight: 40, fontSize: 15 }}
+        >
+          Run routine
+        </button>
+        <button className="btn btn-secondary" onClick={onEdit} disabled={!selectedTemplate} style={{ minHeight: 40 }}>
+          Edit
+        </button>
+        <button className="btn btn-ghost" onClick={onNew} style={{ minHeight: 40 }} title="New template">
+          ＋
+        </button>
+      </div>
+
+      <div style={{ padding: '4px 18px 16px', fontSize: 11.5, color: 'rgba(32,30,29,.45)' }}>
+        “{selectedTemplate?.label ?? ''}” writes to{' '}
+        <span style={{ color: '#006786' }}>{selectedTemplate ? filledPageCount(selectedTemplate) : 0}</span> of 10 script
+        pages
       </div>
     </div>
   )

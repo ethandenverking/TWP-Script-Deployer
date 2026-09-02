@@ -44,7 +44,7 @@ Outputs a load-able extension to `dist/`.
 
 ## Adding a new script
 
-1. Copy `src/scripts/example-script.ts`, give it a unique `id`.
+1. Copy `src/scripts/example-routine.ts`, give it a unique `id`.
 2. Implement `run()` with the DOM automation/logic to deploy.
 3. Register it in the `scripts` array in `src/scripts/index.ts`.
 4. Reload the extension — it now shows up in the popup, enabled by default.

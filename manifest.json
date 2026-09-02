@@ -16,5 +16,6 @@
       "js": ["src/content/index.ts"]
     }
   ],
-  "permissions": ["storage", "activeTab"]
+  "permissions": ["storage", "activeTab", "tabs", "scripting"],
+  "host_permissions": ["https://www.swipeclock.com/*", "https://clock.payrollservers.us/*"]
 }

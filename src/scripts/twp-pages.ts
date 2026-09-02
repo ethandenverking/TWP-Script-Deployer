@@ -18,6 +18,15 @@ export interface TwpScriptPage {
 }
 
 export const twpScriptPages: Record<string, TwpScriptPage> = {
-  slot1: { id: 'otthreshold', label: 'OTThresholdScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=OTThresholdScript' },
-  slot2: { id: 'addentry', label: 'AddEntryScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=AddEntryScript' },
+  slot1: { id: 'round', label: 'RoundScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=RoundScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot2: { id: 'split', label: 'SplitScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=SplitScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot3: { id: 'reportingdate', label: 'ReportingDateScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=ReportingDateScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot4: { id: 'addentry', label: 'AddEntryScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=AddEntryScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot5: { id: 'splitpostreportingdate', label: 'SplitPostReportingDateScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=SplitPostReportingDateScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot6: { id: 'payrate', label: 'PayRateScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=PayRateScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot7: { id: 'accrueuptop', label: 'AccrueUpTopScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=AccrueUpScript', textareaSelector: '#txtScript1', saveButtonSelector: '#btnSave' },
+  slot8: { id: 'accrueup', label: 'AccrueUpBottomScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=AccrueUpScript', textareaSelector: '#txtScript2', saveButtonSelector: '#btnSave' },
+  slot9: { id: 'accruedown', label: 'AccrueDownScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=AccrueDownScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' },
+  slot10: { id: 'otthreshold', label: 'OTThresholdScript', url: 'https://www.swipeclock.com/pg/RuleSetup/Generic.aspx?classname=OTThresholdScript', textareaSelector: '#txtScript', saveButtonSelector: '#btnSave' }
 }
+
