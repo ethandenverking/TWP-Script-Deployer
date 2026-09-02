@@ -1,0 +1,23 @@
+.app {
+  font-family: system-ui, sans-serif;
+  padding: 1rem;
+  text-align: center;
+}
+
+.url {
+  font-size: 0.75rem;
+  color: #666;
+  word-break: break-all;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
+.hint {
+  font-size: 0.7rem;
+  color: #999;
+}
