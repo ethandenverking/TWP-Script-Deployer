@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { scripts } from '../scripts'
 import { ENABLED_SCRIPTS_KEY, type EnabledScriptsMap } from '../scripts/storage'
+import ScriptLibrary from './ScriptLibrary'
 
 function App() {
   const [enabled, setEnabled] = useState<EnabledScriptsMap>({})
@@ -48,6 +49,7 @@ function App() {
           )
         })}
       </ul>
+      <ScriptLibrary />
     </div>
   )
 }

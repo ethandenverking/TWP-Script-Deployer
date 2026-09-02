@@ -51,3 +51,29 @@ button {
   font-size: 0.7rem;
   color: #999;
 }
+
+.script-library {
+  margin-top: 1rem;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  text-align: left;
+}
+
+.script-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.script-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.script-form textarea {
+  font-family: monospace;
+  font-size: 0.75rem;
+  resize: vertical;
+}

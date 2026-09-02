@@ -25,8 +25,7 @@ Outputs a load-able extension to `dist/`.
 
 - `manifest.json` — the extension's manifest (MV3). Declares the popup,
   background service worker, content script, and permissions. `matches` is
-  currently `<all_urls>` as a placeholder — narrow it to the real TWP
-  domain(s) once known.
+  scoped to `https://clock.payrollservers.us/*`, the TimeWorksPlus domain.
 - `vite.config.ts` — build config. The `@crxjs/vite-plugin` reads
   `manifest.json` and wires up the special build steps a Chrome extension
   needs (separate bundles per entry point, HMR for the popup, etc.).
