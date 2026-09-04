@@ -14,19 +14,58 @@ export interface TwpScriptTemplate {
 // in the popup.
 export const twpScriptTemplates: TwpScriptTemplate[] = [
   {
-    id: 'test-script-1',
-    label: 'Test Script 1',
+    id: 'blended-rates',
+    label: 'Blended Rates',
     content: {
-      otthreshold: `ot1threshold = 40;`,
-      addentry: ``,
+      otthreshold: '/// INITIALS - Blended Rates Calculation - XXXXXX - XX/XX/XXX //\n$rrpCategories = "Overtime";\n$hoursWorkedCategories = "Overtime";\nif(within(category, $rrpCategories) and reportingdate.weekhours($hoursWorkedCategories) > 0){\n$rate = reportingdate.totalweek("BlendRate") / reportingdate.weekhours($hoursWorkedCategories); \nif(isedited("Payrate") = false){ \npayrate = round($rate,2);\n}\n}',
+      payrate: `/// INITIALS - Blended Rates Calculation - XXXXXX - XX/XX/XXX //
+      $blendedCategories = "Regular|Makeup Time|Travel Time|Non-Discretionary Bonus";
+                    if(within(category, $blendedCategories)){
+                        if(ishours or istimes){
+                            BlendRate = payrate * hours;
+                        }
+                        if(ispayonly){
+                            BlendRate = amount;
+                        }
+                    }`,
     },
   },
   {
-    id: 'test-script-2',
-    label: 'Test Script 2',
+    id: 'unpay-after-ot-threshold-pp',
+    label: 'Unpay OT after threshold PP',
     content: {
-      otthreshold: ``,
-      addentry: ``,
+      splitpostreportingdate: `/// INITIALS - Unpay OT after threshold PP - XXXXXX - XX/XX/XXX //
+if (category = "Regular") {
+    payperiodhours = hours;
+}
+
+$ot = 80;
+$pwhours = reportingdate.totalpp("payperiodhours") - reportingdate.totalweek("payperiodhours");
+$whours = reportingdate.hourstodateot + $pwhours;
+$dhours = reportingdate.totalhoursot;
+$uptohours = hourstopunchot + ($whours - $dhours);
+$uptohoursinc = $uptohours + hours;
+$uptohoursinc = round($uptohoursinc, 2);
+//addalert($whours);
+if($uptohoursinc > $ot and $uptohours < $ot and istimes and category <> "OT" and reportingdate.totalhours("OT") = 0){
+
+$diff = hours - ($ot - $uptohours);
+unpay($diff);
+addalert("Unpaying portion of hours for Comp Time");
+compHours = $diff;
+
+}
+
+$whours = reportingdate.hourstodateot + $pwhours;
+$dhours = reportingdate.totalhoursot;
+$uptohours = hourstopunchot + ($whours - $dhours);
+$uptohours = round($uptohours, 2);
+if($uptohours >= $ot and istimes){
+unpay(hours);
+compHours = hours;
+addalert("Unpaying hours for Comp Time");
+}
+`,
     },
   },
 ]

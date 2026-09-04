@@ -1,7 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { twpScriptPages, type TwpScriptPage } from '../scripts/twp-pages'
 import type { TwpScriptTemplate } from '../scripts/twp-script-content'
-import { countNonBlankLines, filledPageCountFromContent, stripScriptSuffix } from './format'
+import { countNonBlankLines, filledPageCountFromContent, reindentByBraces, stripScriptSuffix } from './format'
 
 const pages = Object.values(twpScriptPages)
 
@@ -127,6 +127,19 @@ function TemplateEditor({ mode, template, onSaveEdit, onSaveNew, onBack }: Templ
             </div>
           </div>
         </div>
+        <div style={{ borderTop: '1px solid rgba(32,30,29,.14)', padding: '10px 16px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(32,30,29,.5)' }}>
+            Utilities
+          </span>
+          <button
+            className="btn btn-ghost"
+            onClick={() => setBody(reindentByBraces(activeBody))}
+            style={{ minHeight: 26, padding: '0 8px', fontSize: 11 }}
+            title="Re-indent based on curly/paren/square brackets"
+          >
+            Format
+          </button>
+        </div>
       </div>
     )
   }
@@ -191,6 +204,19 @@ function TemplateEditor({ mode, template, onSaveEdit, onSaveNew, onBack }: Templ
             <span>{filledCount} of 10</span>
           </div>
         </div>
+      </div>
+      <div style={{ borderTop: '1px solid rgba(32,30,29,.14)', padding: '10px 16px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{ fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: 'rgba(32,30,29,.5)' }}>
+          Utilities
+        </span>
+        <button
+          className="btn btn-ghost"
+          onClick={() => setBody(reindentByBraces(activeBody))}
+          style={{ minHeight: 26, padding: '0 8px', fontSize: 11 }}
+          title="Re-indent based on curly/paren/square brackets"
+        >
+          Format
+        </button>
       </div>
     </div>
   )

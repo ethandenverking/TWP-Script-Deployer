@@ -148,10 +148,6 @@ function App() {
           templates={templates}
           selectedTemplateId={selectedTemplateId}
           onSelect={setSelectedTemplateId}
-          onOpenEditor={(id) => {
-            setSelectedTemplateId(id)
-            setView('editor')
-          }}
           onRunRoutine={openConfirmSheet}
           onEdit={() => setView('editor')}
           onNew={() => setView('new')}

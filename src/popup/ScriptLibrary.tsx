@@ -9,7 +9,6 @@ interface ScriptLibraryProps {
   templates: TwpScriptTemplate[]
   selectedTemplateId: string
   onSelect: (id: string) => void
-  onOpenEditor: (id: string) => void
   onRunRoutine: () => void
   onEdit: () => void
   onNew: () => void
@@ -26,7 +25,6 @@ function ScriptLibrary({
   templates,
   selectedTemplateId,
   onSelect,
-  onOpenEditor,
   onRunRoutine,
   onEdit,
   onNew,
@@ -80,16 +78,9 @@ function ScriptLibrary({
               }}
             >
               <span
-                onClick={(e) => {
-                  e.stopPropagation()
-                  onOpenEditor(template.id)
-                }}
                 style={{
                   fontSize: 16.5,
                   letterSpacing: '-.01em',
-                  textDecoration: 'underline',
-                  textDecorationColor: 'rgba(0,136,176,.4)',
-                  textUnderlineOffset: '3px',
                 }}
               >
                 {template.label}
